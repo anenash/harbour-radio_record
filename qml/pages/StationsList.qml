@@ -13,7 +13,7 @@ Page {
     property string _radioLogo: "http://www.radiorecord.ru/player/img/logos/"
 
     //https://www.radiorecord.ru/xml/ps_online_v8.txt
-    property string trackStartUrl: "https://www.radiorecord.ru/xml/"
+    property string trackStartUrl: "https://www.radiorecord.ru/radio/"
     property string trackEndUrl: "_online_v8.txt"
 
     property string currentStationId
@@ -27,7 +27,8 @@ Page {
     signal playNext();
 
     Component.onCompleted: {
-        tapHint.start()
+//        tapHint.start()
+        Utils.sendHttpRequest("GET", Utils.stationsUrl, getStationsList)
     }
 
     Timer {
@@ -35,8 +36,18 @@ Page {
         repeat: true
         interval: 7000
         onTriggered: {
-            var url = trackStartUrl + currentStationId + trackEndUrl;
-            Utils.sendHttpRequest("GET", url, getTrackInfo);
+            Utils.sendHttpRequest("GET", Utils.tracksUrl, getTrackInfo);
+        }
+    }
+
+    function getStationsList(data) {
+        if(data === "error") {
+            Utils.sendHttpRequest("GET", Utils.stationsUrl, getStationsList)
+            return;
+        }
+        var json = JSON.parse(data);
+        for (var i in json.result) {
+            stationsList.append(json.result[i])
         }
     }
 
@@ -46,58 +57,34 @@ Page {
             return;
         }
         var json = JSON.parse(data);
-        var source = json.image600
-        if(source) {
-//            console.log("getTrackInfo: radio icon", source)
-            playerItem.stationLogo = source;
-            app.radioIcon = source;
-        } else {
-            playerItem.stationLogo = "RadioRecord.png";
-            app.radioIcon = "RadioRecord.png";
-        }
 
-        app.radioFullTitle = "Artist: " + json.artist + "\nTitle: " + json.title
-        app.radioTitle = "<b>" + json.artist + "</b><br>" + json.title
+        for (var i in json.result) {
+            if (json.result[i].prefix === currentStationId) {
+                playerItem.stationLogo = json.result[i].image600
+                app.radioIcon = json.result[i].image600
+
+                app.radioFullTitle = "Artist: " + json.result[i].artist + "\nTitle: " + json.result[i].song
+                app.radioTitle = "<b>" + json.result[i].artist + "</b><br>" + json.result[i].song
+            }
+        }
     }
-    InteractionHintLabel {
-        anchors.bottom: parent.bottom
-        z: 3
-        opacity: showHint
-        Behavior on opacity { FadeAnimation {} }
-        text: qsTr("Tap and hold to open context menu")
-    }
+
+//    InteractionHintLabel {
+//        anchors.bottom: parent.bottom
+//        z: 3
+//        opacity: showHint
+//        Behavior on opacity { FadeAnimation {} }
+//        text: qsTr("Tap and hold to open context menu")
+//    }
     
-    TapInteractionHint {
-        id: tapHint
-        loops: Animation.Infinite
-        anchors.centerIn: parent        
-    }
+//    TapInteractionHint {
+//        id: tapHint
+//        loops: Animation.Infinite
+//        anchors.centerIn: parent
+//    }
 
     ListModel {
         id: stationsList
-        ListElement { stationId: "rr"; stationName: "Radio Record" }
-        ListElement { stationId: "mix"; stationName: "Megamix" }
-        ListElement { stationId: "deep"; stationName: "Record Deep" }
-        ListElement { stationId: "club"; stationName: "Record Club" }
-        ListElement { stationId: "fut"; stationName: "Future House" }
-        ListElement { stationId: "tm"; stationName: "Trancemission" }
-        ListElement { stationId: "chil"; stationName: "Record Chill-Out" }
-        ListElement { stationId: "mini"; stationName: "Minimal/Tech" }
-        ListElement { stationId: "ps"; stationName: "Pirate Station" }
-        ListElement { stationId: "rus"; stationName: "Russian Mix" }
-        ListElement { stationId: "vip"; stationName: "Vip House" }
-        ListElement { stationId: "sd90"; stationName: "Супердиско 90-х" }
-        ListElement { stationId: "brks"; stationName: "Record Breaks" }
-        ListElement { stationId: "dub"; stationName: "Record Dubstep" }
-        ListElement { stationId: "dc"; stationName: "Record Dancecore" }
-        ListElement { stationId: "techno"; stationName: "Record Techno" }
-        ListElement { stationId: "teo"; stationName: "Record Hardstyle" }
-        ListElement { stationId: "trap"; stationName: "Record Trap" }
-        ListElement { stationId: "pump"; stationName: "Pump" }
-        ListElement { stationId: "rock"; stationName: "Record Rock" }
-        ListElement { stationId: "mdl"; stationName: "Медляк FM" }
-        ListElement { stationId: "gop"; stationName: "Гоп FM" }
-        ListElement { stationId: "yo"; stationName: "Yo! FM" }
     }
 
     Component {
@@ -112,7 +99,7 @@ Page {
                 height: 96 * Theme.pixelRatio
                 width: 96 * Theme.pixelRatio
                 fillMode: Image.PreserveAspectFit
-                source: _radioLogo + stationId + ".jpg"
+                source: icon_png
                 BusyIndicator {
                     size: BusyIndicatorSize.Medium
                     anchors.centerIn: radioLogo
@@ -129,7 +116,7 @@ Page {
                 anchors.left: radioLogo.right
                 anchors.leftMargin: 5
                 anchors.verticalCenter: radioLogo.verticalCenter
-                text: stationName
+                text: title
             }
 
             menu: ContextMenu {
@@ -139,8 +126,8 @@ Page {
                         console.debug("Show top 100")
                         updateTrack.stop();
                         playerItem.stationLogo = "RadioRecord.png"
-                        nextPageTitle = qsTr("Top 100 ") + stationName
-                        var url = trackStartUrl + "top100/" + stationId + ".txt";
+                        nextPageTitle = qsTr("Top 100 ") + title
+                        var url = trackStartUrl + "top100/" + prefix + ".txt";
                         Utils.sendHttpRequest("GET", url, processData);                        ;
                     }
                 }
@@ -149,9 +136,9 @@ Page {
                     onClicked: {
                         console.debug("Show history")
                         ////history.radiorecord.ru/index-flat.php?station='+radio+'&day=today'
-                        var url = "http://history.radiorecord.ru/index-flat.php?station=" + stationId + "&day=today"
+                        var url = "http://history.radiorecord.ru/index-flat.php?station=" + prefix + "&day=today"
                         updateTrack.stop();
-                        nextPageTitle = stationName + qsTr(" history")
+                        nextPageTitle = title + qsTr(" history")
                         playerItem.stationLogo = "RadioRecord.png"
                         Utils.sendHttpRequest("GET", url, processData);
                     }
@@ -169,17 +156,16 @@ Page {
             }
 
             onClicked: {
-                radioView.currentIndex = index;
-                currentStationId = stationId;
+                radioView.currentIndex = index
+                currentStationId = prefix
                 playerItem.streamBitrate = _streamBitrate === "_320"?"320 kbps":_streamBitrate === "_128"?"128 kbps":"32 kbps"
 
-                radioIcon = _radioLogo + stationId + ".jpg";
-                radioTitle = stationName
+                radioIcon = icon_png
+                radioTitle = title
                 player.stop()
-                player.source = _streamUrl + stationId + _streamBitrate
+                player.source = _streamBitrate === "_320"?stream_320:_streamBitrate === "_128"?stream_128:stream_64 //_streamUrl + prefix + _streamBitrate
                 player.play()
-                var url = trackStartUrl + currentStationId + trackEndUrl;
-                Utils.sendHttpRequest("GET", url, getTrackInfo);
+                Utils.sendHttpRequest("GET", Utils.tracksUrl, getTrackInfo)
                 updateTrack.start()
                 drawer.open = true
             }

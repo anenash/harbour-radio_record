@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 
 import "Utils.js" as Utils
 
-import harbour.radiorecord 1.0
+//import harbour.radiorecord 1.0
 
 Page {
     id: top100page
@@ -70,12 +70,12 @@ Page {
                 width: parent.width
                 indeterminate: true
             }
-            FileDownloader {
-                id: downloader
-                onDownloaded: {
-                    progressBar.visible = false
-                }
-            }
+//            FileDownloader {
+//                id: downloader
+//                onDownloaded: {
+//                    progressBar.visible = false
+//                }
+//            }
             onClicked: {
                 radioView.currentIndex = index;
             }

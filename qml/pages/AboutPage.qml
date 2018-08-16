@@ -27,7 +27,7 @@ Page {
             anchors.margins: Theme.paddingLarge
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
-            text: qsTr("Simple media player for the ") + "<a href=\"http://www.radiorecord.ru/\">Record Dance radio/</a>"
+            text: qsTr("Media player for the ") + "<a href=\"http://www.radiorecord.ru/\">Record Dance radio/</a>"
             onLinkActivated: {
                 Qt.openUrlExternally(link);
             }

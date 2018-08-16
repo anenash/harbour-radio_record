@@ -37,8 +37,8 @@
 #include <QQmlContext>
 #include <sailfishapp.h>
 //#include "systemimei.h"
-#include "network.h"
-#include "filedownloader.h"
+//#include "network.h"
+//#include "filedownloader.h"
 
 
 int main(int argc, char *argv[])
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     //   - SailfishApp::pathTo(QString) to get a QUrl to a resource file
     //
     // To display the view, call "show()" (will show fullscreen on device).
-    qmlRegisterType<Network>("harbour.network", 1, 0, "Network");
-    qmlRegisterType<FileDownloader>("harbour.radiorecord", 1, 0, "FileDownloader");
+//    qmlRegisterType<Network>("harbour.network", 1, 0, "Network");
+//    qmlRegisterType<FileDownloader>("harbour.radiorecord", 1, 0, "FileDownloader");
     return SailfishApp::main(argc, argv);
 //    return app->exec();
 }

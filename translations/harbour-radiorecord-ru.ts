@@ -8,12 +8,12 @@
         <translation>О программе</translation>
     </message>
     <message>
-        <source>Simple media player for the </source>
-        <translation>Простой плеер для </translation>
-    </message>
-    <message>
         <source>I will be very appreciated if you will support this application.</source>
         <translation>Я буду очень признателен, если вы поддержите развитие этого приложения.</translation>
+    </message>
+    <message>
+        <source>Media player for the </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 
 import "Utils.js" as Utils
 
-import "../Advert"
+//import "../Advert"
 
 Page {
     id: startPage
@@ -20,14 +20,14 @@ Page {
 
     property string currentStationId
 
-    AdParameters {
-        id: params
-        applicationId: "anenash_anenash_Aviasales_UbuntuTouch_other"
-        appName: "RadioRecord"
-        keywords: "music,radio,club"
-        usePositioning: false
-        category: "music"
-    }
+//    AdParameters {
+//        id: params
+//        applicationId: "anenash_anenash_Aviasales_UbuntuTouch_other"
+//        appName: "RadioRecord"
+//        keywords: "music,radio,club"
+//        usePositioning: false
+//        category: "music"
+//    }
 
     PageHeader {
         id: header
@@ -55,22 +55,22 @@ Page {
         }
     }
 
-    Item {
-        id: advertBanner
-//        anchors.top: gridView.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-//        width: parent.width
-        height: 30 * Theme.pixelRatio
-        AdItem {
-            anchors.fill: parent
-            retryOnError: true
-            reloadInterval: 100
-            parameters: params
-//            anchors.bottom: parent.bottom
-//            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
+//    Item {
+//        id: advertBanner
+////        anchors.top: gridView.bottom
+//        anchors.bottom: parent.bottom
+//        anchors.left: parent.left
+//        anchors.right: parent.right
+////        width: parent.width
+//        height: 30 * Theme.pixelRatio
+////        AdItem {
+////            anchors.fill: parent
+////            retryOnError: true
+////            reloadInterval: 100
+////            parameters: params
+//////            anchors.bottom: parent.bottom
+//////            anchors.horizontalCenter: parent.horizontalCenter
+////        }
+//    }
 }
 
