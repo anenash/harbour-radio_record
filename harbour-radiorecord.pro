@@ -14,9 +14,9 @@ TARGET = harbour-radiorecord
 
 CONFIG += sailfishapp
 
-SOURCES += src/harbour-radiorecord.cpp
+SOURCES += src/harbour-radiorecord.cpp \
 #    src/systemimei.cpp \
-#    src/filedownloader.cpp \
+    src/filedownloader.cpp
 #    src/network.cpp
 
 OTHER_FILES += qml/harbour-radiorecord.qml \
@@ -52,10 +52,11 @@ DISTFILES += \
     qml/pages/StartPage.qml \
     qml/pages/PlayerItem.qml \
     qml/pages/AboutPage.qml \
-    qml/pages/Top100_history.qml
+    qml/pages/Top100_history.qml \
+    qml/pages/PodcastPage.qml
 
 HEADERS += \
 #    src/systemimei.h \
-#    src/filedownloader.h \
+    src/filedownloader.h
 #    src/network.h
 

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Sailfish.Silica 1.0
 
 import "Utils.js" as Utils
@@ -26,6 +26,12 @@ Page {
 
     signal playNext();
 
+    QtObject {
+        id: internal
+
+        property bool isRadio: true
+    }
+
     Component.onCompleted: {
 //        tapHint.start()
         Utils.sendHttpRequest("GET", Utils.stationsUrl, getStationsList)
@@ -49,6 +55,18 @@ Page {
         for (var i in json.result) {
             stationsList.append(json.result[i])
         }
+        Utils.sendHttpRequest("GET", Utils.podcastIdsUrl, getPocastsList)
+    }
+
+    function getPocastsList(data) {
+        if(data === "error") {
+            Utils.sendHttpRequest("GET", Utils.podcastIdsUrl, getPocastsList)
+            return;
+        }
+        var json = JSON.parse(data);
+        for (var i in json.result) {
+            podcastsList.append(json.result[i])
+        }
     }
 
     function getTrackInfo(data) {
@@ -59,7 +77,7 @@ Page {
         var json = JSON.parse(data);
 
         for (var i in json.result) {
-            if (json.result[i].prefix === currentStationId) {
+            if (json.result[i].prefix.toString() === currentStationId.toString()) {
                 playerItem.stationLogo = json.result[i].image600
                 app.radioIcon = json.result[i].image600
 
@@ -85,6 +103,10 @@ Page {
 
     ListModel {
         id: stationsList
+    }
+
+    ListModel {
+        id: podcastsList
     }
 
     Component {
@@ -137,7 +159,7 @@ Page {
                         console.debug("Show history")
                         ////history.radiorecord.ru/index-flat.php?station='+radio+'&day=today'
                         var url = "http://history.radiorecord.ru/index-flat.php?station=" + prefix + "&day=today"
-                        updateTrack.stop();
+                        updateTrack.stop()
                         nextPageTitle = title + qsTr(" history")
                         playerItem.stationLogo = "RadioRecord.png"
                         Utils.sendHttpRequest("GET", url, processData);
@@ -172,6 +194,49 @@ Page {
         }
     }
 
+    Component {
+        id: podcastDelegate
+        ListItem {
+            contentHeight: Theme.itemSizeLarge
+            Image {
+                id: podcastLogo
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.paddingLarge
+                anchors.verticalCenter: parent.verticalCenter
+                height: 96 * Theme.pixelRatio
+                width: 96 * Theme.pixelRatio
+                fillMode: Image.PreserveAspectFit
+                source: cover
+                BusyIndicator {
+                    size: BusyIndicatorSize.Medium
+                    anchors.centerIn: podcastLogo
+                    running: podcastLogo.status != Image.Ready
+                }
+                onStatusChanged: {
+                    if(status === Image.Error) {
+                        console.debug("Can not load image");
+                        source = "RadioRecord.png"
+                    }
+                }
+            }
+            Label {
+                anchors.left: podcastLogo.right
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.verticalCenter: podcastLogo.verticalCenter
+                text: name
+            }
+
+            onClicked: {
+                radioView.currentIndex = index
+//                currentStationId = prefix
+//                playerItem.streamBitrate = _streamBitrate === "_320"?"320 kbps":_streamBitrate === "_128"?"128 kbps":"32 kbps"
+
+                radioIcon = cover
+                radioTitle = name
+                pageStack.push(Qt.resolvedUrl("PodcastPage.qml"), {id: id})
+            }
+        }
+    }
 
     Drawer {
         id: drawer
@@ -189,8 +254,8 @@ Page {
             id: radioView
             anchors.fill: parent
             header: PageHeader { id: viewHeader; title: qsTr("Radio Record") }
-            model: stationsList
-            delegate: stationDelegate
+            model: internal.isRadio?stationsList:podcastsList
+            delegate: internal.isRadio?stationDelegate:podcastDelegate
             spacing: Theme.paddingSmall
             clip: true
             currentIndex: -1
@@ -204,44 +269,58 @@ Page {
                 MenuItem {
                     text: qsTr("About")
                     onClicked: {
-                        pageStack.push(Qt.resolvedUrl("AboutPage.qml"));
+                        pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
                     }
                 }
                 MenuItem {
-                    text: qsTr("Stream quality 32 kbps")
-                    font.bold: _streamBitrate === "_aac?type=.flv"?true:false
+                    text: internal.isRadio?qsTr("Podcasts"):qsTr("Radio stations")
                     onClicked: {
-                        //http://air2.radiorecord.ru:805/rr_aac?type=.flv
-                        _streamBitrate = "_aac?type=.flv"
-                        playerItem.streamBitrate = "32 kbps"
-                        playerItem.player.stop()
-                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-                        playerItem.player.play()
-//                        app.endOfSong.connect();
+                        internal.isRadio = !internal.isRadio
+                        if (!internal.isRadio) {
+                            updateTrack.stop()
+                            player.stop()
+                            radioPlayer.source = ""
+                            drawer.open = false
+                        }
+
+//                        pageStack.push(Qt.resolvedUrl("AboutPage.qml"));
                     }
                 }
-                MenuItem {
-                    text: qsTr("Stream quality 128 kbps")
-                    font.bold: _streamBitrate === "128 kbps"?true:false
-                    onClicked: {
-                        _streamBitrate = "_128"
-                        playerItem.streamBitrate = "128 kbps"
-                        playerItem.player.stop()
-                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-                        playerItem.player.play()
-                    }
-                }
-                MenuItem {
-                    text: qsTr("Stream quality 320 kbps")
-                    font.bold: _streamBitrate === "320 kbps"?true:false
-                    onClicked: {
-                        _streamBitrate = "_320"
-                        playerItem.streamBitrate = "320 kbps"
-                        playerItem.player.stop()
-                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-                        playerItem.player.play()
-                    }
-                }
+//                MenuItem {
+//                    text: qsTr("Stream quality 32 kbps")
+//                    font.bold: _streamBitrate === "_aac?type=.flv"?true:false
+//                    onClicked: {
+//                        //http://air2.radiorecord.ru:805/rr_aac?type=.flv
+//                        _streamBitrate = "_aac?type=.flv"
+//                        playerItem.streamBitrate = "32 kbps"
+//                        playerItem.player.stop()
+//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
+//                        playerItem.player.play()
+////                        app.endOfSong.connect();
+//                    }
+//                }
+//                MenuItem {
+//                    text: qsTr("Stream quality 128 kbps")
+//                    font.bold: _streamBitrate === "128 kbps"?true:false
+//                    onClicked: {
+//                        _streamBitrate = "_128"
+//                        playerItem.streamBitrate = "128 kbps"
+//                        playerItem.player.stop()
+//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
+//                        playerItem.player.play()
+//                    }
+//                }
+//                MenuItem {
+//                    text: qsTr("Stream quality 320 kbps")
+//                    font.bold: _streamBitrate === "320 kbps"?true:false
+//                    onClicked: {
+//                        _streamBitrate = "_320"
+//                        playerItem.streamBitrate = "320 kbps"
+//                        playerItem.player.stop()
+//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
+//                        playerItem.player.play()
+//                    }
+//                }
             }
         }
     }

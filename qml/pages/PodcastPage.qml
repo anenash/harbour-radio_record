@@ -6,39 +6,52 @@ import "Utils.js" as Utils
 import harbour.radiorecord 1.0
 
 Page {
-    id: top100page
+    id: podcastPage
 
-    property string htmlData: ""
-    property string pageHeader: qsTr("Top 100")
+    property string id
 
-    ListModel {
-        id: listModel
+    QtObject {
+        id: internal
+
+        property string coverLink: "RadioRecord.png"
+        property string pageHeader: qsTr("Podcasts")
     }
 
     Component.onCompleted: {
-//        app.radioPlayer.onStatusChanged: {
-//            console.log(" the media has played to the end.")
-////            radioView.incrementCurrentIndex()
-//        }
-        Utils.getTop100(htmlData, listModel);
+        var url = Utils.pocaststracsUrl + id
+        Utils.sendHttpRequest("GET", url, getPodcastTracks)
     }
 
-    Component.onDestruction: {
-        console.log("top 100 back")
-        app.showFullControl = false
+    function getPodcastTracks(data) {
+        if(data === "error") {
+            var url = Utils.pocaststracsUrl + id
+            Utils.sendHttpRequest("GET", url, getPodcastTracks)
+            return;
+        }
+        var json = JSON.parse(data)
+        internal.coverLink = json.result.cover
+        for (var i in json.result.items) {
+            podcastsModel.append(json.result.items[i])
+        }
+    }
+
+    ListModel {
+        id: podcastsModel
     }
 
     Component {
-        id: listModelDelegate
+        id: podcastsModelDelegate
         ListItem {
             contentHeight: Theme.itemSizeLarge
-            IconButton {
+            Image {
                 id: iconButton
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingLarge
                 z: 3
-                icon.source: "image://theme/icon-m-music"
+                height: parent.height
+                fillMode: Image.PreserveAspectFit
+                source: internal.coverLink
             }
 
             Label {
@@ -60,7 +73,7 @@ Page {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.paddingSmall
                 font.pixelSize: Theme.fontSizeExtraSmall
-                text: "Track: " + title
+                text: "Track: " + song
                 wrapMode: Text.WordWrap
             }
             ProgressBar {
@@ -77,14 +90,14 @@ Page {
                 }
             }
             onClicked: {
-                radioView.currentIndex = index;
+                podcastsView.currentIndex = index;
             }
             menu: ContextMenu {
                     MenuItem {
                         enabled: true
-                        text: qsTr("Download track")
+                        text: qsTr("Download podcast")
                         onClicked: {
-                            downloader.m_fileUrl = listModel.get(index).href
+                            downloader.m_fileUrl = podcastsModel.get(index).link
                             console.log("Player source", app.player.source)
                             progressBar.visible = true
                         }
@@ -93,9 +106,8 @@ Page {
         }
     }
 
-
     Drawer {
-        id: top100drawer
+        id: podacstsDrawer
 
         anchors.fill: parent
         dock: Dock.Bottom
@@ -106,23 +118,23 @@ Page {
             anchors.fill: parent
             showFullControl: true
             onNextSong: {
-                radioView.incrementCurrentIndex()
+                podcastsView.incrementCurrentIndex()
             }
             onPrevSong: {
-                radioView.decrementCurrentIndex()
+                podcastsView.decrementCurrentIndex()
             }
             onEndOfSong: {
-                radioView.incrementCurrentIndex()
+                podcastsView.incrementCurrentIndex()
             }
         }
 
         backgroundSize: 250 * Theme.pixelRatio
         SilicaListView {
-            id: radioView
+            id: podcastsView
             anchors.fill: parent
-            header: PageHeader { id: viewHeader; title: pageHeader}
-            model: listModel
-            delegate: listModelDelegate
+            header: PageHeader { id: viewHeader; title: internal.pageHeader}
+            model: podcastsModel
+            delegate: podcastsModelDelegate
             spacing: Theme.paddingLarge
             clip: true
             highlight: Rectangle {
@@ -131,19 +143,16 @@ Page {
             }
 
             VerticalScrollDecorator { }
-//            onCurrentItemChanged: {
-//                console.log("onCurrentItemChanged ", item.title)
-//            }
+
             onCurrentIndexChanged: {
                 app.player.stop()
-                app.radioFullTitle = "<b>Artist:</b> " + listModel.get(currentIndex).artist + "<br><b>Title:</b> " + listModel.get(currentIndex).title
-                app.radioIcon = "RadioRecord.png"
-                app.radioTitle = "<b>" + listModel.get(currentIndex).artist + "</b><br>" + listModel.get(currentIndex).title
-                app.player.source = listModel.get(currentIndex).href
+                app.radioFullTitle = "<b>Artist:</b> " + podcastsModel.get(currentIndex).artist + "<br><b>Title:</b> " + podcastsModel.get(currentIndex).song
+                app.radioIcon = internal.coverLink
+                app.radioTitle = "<b>" + podcastsModel.get(currentIndex).artist + "</b><br>" + podcastsModel.get(currentIndex).song
+                app.player.source = podcastsModel.get(currentIndex).link
                 app.player.play()
                 console.log("is seekable", app.player.seekable)
             }
         }
     }
 }
-

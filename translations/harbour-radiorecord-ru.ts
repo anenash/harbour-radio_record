@@ -17,6 +17,17 @@
     </message>
 </context>
 <context>
+    <name>PodcastPage</name>
+    <message>
+        <source>Download podcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Podcasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StartPage</name>
     <message>
         <source>Radio Record</source>
@@ -34,18 +45,6 @@
         <translation>О программе</translation>
     </message>
     <message>
-        <source>Stream quality 32 kbps</source>
-        <translation>Качество стрима 32 kbps</translation>
-    </message>
-    <message>
-        <source>Stream quality 128 kbps</source>
-        <translation>Качество стрима 128 kbps</translation>
-    </message>
-    <message>
-        <source>Stream quality 320 kbps</source>
-        <translation>Качество стрима 320 kbps</translation>
-    </message>
-    <message>
         <source>Top 100</source>
         <translation>Топ 100</translation>
     </message>
@@ -58,7 +57,11 @@
         <translation> история</translation>
     </message>
     <message>
-        <source>Tap and hold to open context menu</source>
+        <source>Podcasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio stations</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -38,7 +38,7 @@
 #include <sailfishapp.h>
 //#include "systemimei.h"
 //#include "network.h"
-//#include "filedownloader.h"
+#include "filedownloader.h"
 
 
 int main(int argc, char *argv[])
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 //    qmlRegisterType<Network>("harbour.network", 1, 0, "Network");
-//    qmlRegisterType<FileDownloader>("harbour.radiorecord", 1, 0, "FileDownloader");
+    qmlRegisterType<FileDownloader>("harbour.radiorecord", 1, 0, "FileDownloader");
     return SailfishApp::main(argc, argv);
 //    return app->exec();
 }
