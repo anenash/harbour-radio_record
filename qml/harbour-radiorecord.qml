@@ -57,12 +57,7 @@ ApplicationWindow
         autoLoad: false
         onError: {
             console.log("Error happened", radioPlayer.errorString)
-        }
-//        onStatusChanged: {
-//            if(status === Audio.EndOfMedia) {
-//                console.log(" the media has played to the end.")
-//            }
-//        }
+        }                
     }
 }
 

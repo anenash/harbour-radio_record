@@ -28,6 +28,17 @@
     </message>
 </context>
 <context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stream quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StartPage</name>
     <message>
         <source>Radio Record</source>

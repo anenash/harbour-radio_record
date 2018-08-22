@@ -7,7 +7,7 @@ Item {
 
 //    property alias stationName: app.radioFullTitle //currentStationName.text
     property alias stationLogo: currentRadioLogo.source
-    property alias streamBitrate: sreamBitrateLabel.text
+    property alias streamBitrate: sreamBitrateLabel.value
 
     property bool showFullControl: false
 
@@ -15,9 +15,10 @@ Item {
     property bool nextTrack: app.switchToNext
     property bool prevTrack: app.switchToPrev
 
-    signal prevSong();
-    signal nextSong();
-    signal endOfSong();
+    signal bitrateQuality(var bitrate)
+    signal prevSong()
+    signal nextSong()
+    signal endOfSong()
 
     property int position: app.player.position
 
@@ -40,18 +41,39 @@ Item {
     anchors.fill: parent
 
     onStatusPlayerChanged: {
-        if(statusPlayer === Audio.EndOfMedia) {
-            console.log("player next song.");
-            endOfSong();
+        console.log("status changed", statusPlayer)
+        switch (statusPlayer) {
+        case Audio.EndOfMedia:
+            endOfSong()
+            break
+        case Audio.Stalled:
+            console.log("status Audio.Stalled")
+            if (app.player.playbackState !== Audio.StoppedState && app.player.playbackState !== Audio.PausedState) {
+                console.log("Pause player")
+                app.player.pause()
+            }
+            break
+        case Audio.Buffered:
+            console.log("status Audio.Buffered")
+            if (app.player.playbackState !== Audio.StoppedState && app.player.playbackState === Audio.PausedState) {
+                console.log("start player")
+                app.player.play()
+            }
+            break
         }
+
+//        if(statusPlayer === Audio.EndOfMedia) {
+//            console.log("player next song.")
+//            endOfSong()
+//        }
     }
 
     onNextTrackChanged: {
-        nextSong();
+        nextSong()
     }
 
     onPrevTrackChanged: {
-        prevSong();
+        prevSong()
     }
 
     onPositionChanged: {
@@ -76,12 +98,12 @@ Item {
         visible: !showFullControl
         onStatusChanged: {
             if(status === Image.Error) {
-                console.log("Can not load image");
+                console.log("Can not load image")
                 source = "RadioRecord.png"
             }
         }
         onSourceChanged: {
-            console.log("load image", source);
+            console.log("load image", source)
             update()
         }
     }
@@ -119,7 +141,7 @@ Item {
         icon.source: "image://theme/icon-m-previous"
         visible: showFullControl
         onClicked: {
-            prevSong();
+            prevSong()
         }
     }
 
@@ -140,12 +162,12 @@ Item {
             if (app.player.playbackState === 1) {
                 app.player.stop()
                 app.coverButtonIcon = "image://theme/icon-cover-play"
-//                updateSlider.stop();
+//                updateSlider.stop()
             } else {
                 app.player.play()
                 app.coverButtonIcon = "image://theme/icon-cover-pause"
 //                if(showFullControl && app.player.seekable) {
-//                    updateSlider.start();
+//                    updateSlider.start()
 //                }
             }
         }
@@ -159,16 +181,55 @@ Item {
         icon.source: "image://theme/icon-m-next"
         visible: showFullControl
         onClicked: {
-            nextSong();
+            nextSong()
         }
     }
-    Label {
+//    Label {
+//        id: sreamBitrateLabel
+//        anchors.right: parent.right
+//        anchors.rightMargin: 10 * Theme.pixelRatio
+//        anchors.bottom: parent.bottom
+//        anchors.bottomMargin: 10 * Theme.pixelRatio
+//        font.pixelSize: Theme.fontSizeSmall
+//    }
+//    ComboBox {
+//        id: sreamBitrateLabel
+//        anchors.right: parent.right
+//        anchors.rightMargin: 10 * Theme.pixelRatio
+//        anchors.bottom: parent.bottom
+//        anchors.bottomMargin: 10 * Theme.pixelRatio
+//        width: parent.width * 0.3
+////        font.pixelSize: Theme.fontSizeSmall
+////        label: value + " kbps"
+
+//        menu: ContextMenu {
+//            MenuItem { text: "320" }
+//            MenuItem { text: "128" }
+//            MenuItem { text: "64" }
+//        }
+
+//        onCurrentItemChanged: {
+//            console.log(currentItem.text)
+//        }
+//    }
+
+    ValueButton {
         id: sreamBitrateLabel
+
         anchors.right: parent.right
         anchors.rightMargin: 10 * Theme.pixelRatio
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10 * Theme.pixelRatio
-        font.pixelSize: Theme.fontSizeSmall
+        width: parent.width * 0.3
+
+        onClicked: {
+            var dialog = pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+
+            dialog.accepted.connect(function() {
+                value = dialog.rate
+                bitrateQuality(value)
+            })
+        }
     }
 }
 

@@ -4,7 +4,6 @@ import Sailfish.Silica 1.0
 import "Utils.js" as Utils
 
 Page {
-
     id: aboutPage
     orientation: Orientation.Portrait
     allowedOrientations: Orientation.Portrait

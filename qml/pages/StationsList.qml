@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Sailfish.Silica 1.0
 
 import "Utils.js" as Utils
+import "Database.js" as Database
 
 Page {
     id: stationsPage
@@ -172,10 +173,10 @@ Page {
                 pageStack.push(Qt.resolvedUrl("Top100_history.qml"), {htmlData: data, pageHeader: nextPageTitle});
             }
 
-            onPressed: {
-                showHint = false
-                tapHint.stop()
-            }
+//            onPressed: {
+//                showHint = false
+//                tapHint.stop()
+//            }
 
             onClicked: {
                 radioView.currentIndex = index
@@ -228,8 +229,6 @@ Page {
 
             onClicked: {
                 radioView.currentIndex = index
-//                currentStationId = prefix
-//                playerItem.streamBitrate = _streamBitrate === "_320"?"320 kbps":_streamBitrate === "_128"?"128 kbps":"32 kbps"
 
                 radioIcon = cover
                 radioTitle = name
@@ -282,45 +281,31 @@ Page {
                             radioPlayer.source = ""
                             drawer.open = false
                         }
-
-//                        pageStack.push(Qt.resolvedUrl("AboutPage.qml"));
                     }
                 }
-//                MenuItem {
-//                    text: qsTr("Stream quality 32 kbps")
-//                    font.bold: _streamBitrate === "_aac?type=.flv"?true:false
-//                    onClicked: {
-//                        //http://air2.radiorecord.ru:805/rr_aac?type=.flv
-//                        _streamBitrate = "_aac?type=.flv"
-//                        playerItem.streamBitrate = "32 kbps"
-//                        playerItem.player.stop()
-//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-//                        playerItem.player.play()
-////                        app.endOfSong.connect();
-//                    }
-//                }
-//                MenuItem {
-//                    text: qsTr("Stream quality 128 kbps")
-//                    font.bold: _streamBitrate === "128 kbps"?true:false
-//                    onClicked: {
-//                        _streamBitrate = "_128"
-//                        playerItem.streamBitrate = "128 kbps"
-//                        playerItem.player.stop()
-//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-//                        playerItem.player.play()
-//                    }
-//                }
-//                MenuItem {
-//                    text: qsTr("Stream quality 320 kbps")
-//                    font.bold: _streamBitrate === "320 kbps"?true:false
-//                    onClicked: {
-//                        _streamBitrate = "_320"
-//                        playerItem.streamBitrate = "320 kbps"
-//                        playerItem.player.stop()
-//                        playerItem.player.source = _streamUrl + currentStationId + _streamBitrate
-//                        playerItem.player.play()
-//                    }
-//                }
+            }
+            Connections {
+                target: playerItem
+                onBitrateQuality: {
+                    player.stop()
+                    switch (bitrate) {
+                    case "320 kbps":
+                        player.source = stationsList.get(radioView.currentIndex).stream_320
+                        _streamBitrate = "_320"
+                        break
+                    case "128 kbps":
+                        player.source = stationsList.get(radioView.currentIndex).stream_128
+                        _streamBitrate = "_128"
+                        break
+                    case "64 kbps":
+                        player.source = stationsList.get(radioView.currentIndex).stream_64
+                        _streamBitrate = "_64"
+                        break
+                    }
+                    player.play()
+
+                    console.log("Quality changed to", player.source)
+                }
             }
         }
     }

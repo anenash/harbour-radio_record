@@ -53,7 +53,8 @@ DISTFILES += \
     qml/pages/PlayerItem.qml \
     qml/pages/AboutPage.qml \
     qml/pages/Top100_history.qml \
-    qml/pages/PodcastPage.qml
+    qml/pages/PodcastPage.qml \
+    qml/pages/SettingsPage.qml
 
 HEADERS += \
 #    src/systemimei.h \
