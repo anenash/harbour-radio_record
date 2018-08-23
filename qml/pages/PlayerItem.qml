@@ -226,6 +226,7 @@ Item {
             var dialog = pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
 
             dialog.accepted.connect(function() {
+                console.log("New bitrate", dialog.rate)
                 value = dialog.rate
                 bitrateQuality(value)
             })

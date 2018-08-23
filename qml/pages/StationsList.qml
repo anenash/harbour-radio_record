@@ -2,13 +2,12 @@ import QtQuick 2.6
 import Sailfish.Silica 1.0
 
 import "Utils.js" as Utils
-import "Database.js" as Database
+import "../utils"
 
 Page {
     id: stationsPage
     //"http://air2.radiorecord.ru:805/rr_320"
     property string _streamUrl: "http://air2.radiorecord.ru:805/"
-    property string _streamBitrate: "_320"
 
     //http://www.radiorecord.ru/player/img/logos/rr.jpg
     property string _radioLogo: "http://www.radiorecord.ru/player/img/logos/"
@@ -21,7 +20,6 @@ Page {
 
     property string nextPageTitle: qsTr("Top 100")
 
-    property bool showHint: true
 
     anchors.margins: 5 * Theme.pixelRatio
 
@@ -31,10 +29,28 @@ Page {
         id: internal
 
         property bool isRadio: true
+        property string streamBitrate: "128 kbps"
+        property bool showHint: true
+    }
+
+    Database {
+        id: database
     }
 
     Component.onCompleted: {
-//        tapHint.start()
+        database.initDatabase()
+        var bitrate = database.getSettingsValue("bitrate")
+        if (bitrate) {
+            internal.streamBitrate = bitrate
+        }
+        var showHint = database.getSettings("hints")
+        if (showHint) {
+            internal.showHint = showHint == 0
+            if (!internal.showHint) {
+                tapHint.stop()
+            }
+        }
+
         Utils.sendHttpRequest("GET", Utils.stationsUrl, getStationsList)
     }
 
@@ -88,19 +104,39 @@ Page {
         }
     }
 
-//    InteractionHintLabel {
-//        anchors.bottom: parent.bottom
-//        z: 3
-//        opacity: showHint
-//        Behavior on opacity { FadeAnimation {} }
-//        text: qsTr("Tap and hold to open context menu")
-//    }
+    function changeBitrate(newBitrate) {
+        player.stop()
+        switch (internal.streamBitrate) {
+        case "320 kbps":
+            player.source = stationsList.get(radioView.currentIndex).stream_320
+            break
+        case "128 kbps":
+            player.source = stationsList.get(radioView.currentIndex).stream_128
+            break
+        case "64 kbps":
+            player.source = stationsList.get(radioView.currentIndex).stream_64
+            break
+        }
+        player.play()
+
+        console.log("Quality changed to", player.source)
+    }
+
+    InteractionHintLabel {
+        anchors.bottom: parent.bottom
+        z: 3
+        opacity: internal.showHint
+        visible: internal.showHint
+        Behavior on opacity { FadeAnimation {} }
+        text: qsTr("Tap and hold to open context menu")
+    }
     
-//    TapInteractionHint {
-//        id: tapHint
-//        loops: Animation.Infinite
-//        anchors.centerIn: parent
-//    }
+    TapInteractionHint {
+        id: tapHint
+        loops: Animation.Infinite
+        anchors.centerIn: parent
+        visible: internal.showHint
+    }
 
     ListModel {
         id: stationsList
@@ -173,20 +209,20 @@ Page {
                 pageStack.push(Qt.resolvedUrl("Top100_history.qml"), {htmlData: data, pageHeader: nextPageTitle});
             }
 
-//            onPressed: {
-//                showHint = false
-//                tapHint.stop()
-//            }
+            onPressed: {
+                internal.showHint = false
+                tapHint.stop()
+                database.storeSettings("hints", 1, "")
+            }
 
             onClicked: {
                 radioView.currentIndex = index
                 currentStationId = prefix
-                playerItem.streamBitrate = _streamBitrate === "_320"?"320 kbps":_streamBitrate === "_128"?"128 kbps":"32 kbps"
-
+                playerItem.streamBitrate = internal.streamBitrate
                 radioIcon = icon_png
                 radioTitle = title
                 player.stop()
-                player.source = _streamBitrate === "_320"?stream_320:_streamBitrate === "_128"?stream_128:stream_64 //_streamUrl + prefix + _streamBitrate
+                player.source = internal.streamBitrate === "320 kbps"?stream_320:internal.streamBitrate === "128 kbps"?stream_128:stream_64
                 player.play()
                 Utils.sendHttpRequest("GET", Utils.tracksUrl, getTrackInfo)
                 updateTrack.start()
@@ -272,6 +308,20 @@ Page {
                     }
                 }
                 MenuItem {
+                    text: qsTr("Settings")
+                    onClicked: {
+                        var dialog = pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+
+                        dialog.accepted.connect(function() {
+                            console.log("New bitrate", dialog.rate)
+                            internal.streamBitrate = dialog.rate
+                            if (radioView.currentIndex >= 0) {
+                                changeBitrate(internal.streamBitrate)
+                            }
+                        })
+                    }
+                }
+                MenuItem {
                     text: internal.isRadio?qsTr("Podcasts"):qsTr("Radio stations")
                     onClicked: {
                         internal.isRadio = !internal.isRadio
@@ -287,24 +337,9 @@ Page {
             Connections {
                 target: playerItem
                 onBitrateQuality: {
-                    player.stop()
-                    switch (bitrate) {
-                    case "320 kbps":
-                        player.source = stationsList.get(radioView.currentIndex).stream_320
-                        _streamBitrate = "_320"
-                        break
-                    case "128 kbps":
-                        player.source = stationsList.get(radioView.currentIndex).stream_128
-                        _streamBitrate = "_128"
-                        break
-                    case "64 kbps":
-                        player.source = stationsList.get(radioView.currentIndex).stream_64
-                        _streamBitrate = "_64"
-                        break
-                    }
-                    player.play()
+                    internal.streamBitrate = bitrate
 
-                    console.log("Quality changed to", player.source)
+                    changeBitrate(internal.streamBitrate)
                 }
             }
         }

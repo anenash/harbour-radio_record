@@ -40,7 +40,6 @@ CONFIG += sailfishapp_i18n
 TRANSLATIONS += translations/harbour-radiorecord-ru.ts
 
 DISTFILES += \
-    qml/pages/Database.js \
     qml/pages/Utils.js \
     qml/pages/RadioRecord.png \
     qml/pages/StationsList.qml \
@@ -54,7 +53,8 @@ DISTFILES += \
     qml/pages/AboutPage.qml \
     qml/pages/Top100_history.qml \
     qml/pages/PodcastPage.qml \
-    qml/pages/SettingsPage.qml
+    qml/pages/SettingsPage.qml \
+    qml/utils/Database.qml
 
 HEADERS += \
 #    src/systemimei.h \

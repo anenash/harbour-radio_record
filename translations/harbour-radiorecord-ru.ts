@@ -37,6 +37,10 @@
         <source>Stream quality</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show hints on start</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StartPage</name>
@@ -73,6 +77,14 @@
     </message>
     <message>
         <source>Radio stations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap and hold to open context menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
