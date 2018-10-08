@@ -13,40 +13,33 @@
     </message>
     <message>
         <source>Media player for the </source>
-        <translation type="unfinished"></translation>
+        <translation>Медиа плеер для </translation>
     </message>
 </context>
 <context>
     <name>PodcastPage</name>
     <message>
         <source>Download podcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить подкаст</translation>
     </message>
     <message>
         <source>Podcasts</source>
-        <translation type="unfinished"></translation>
+        <translation>Подкасты</translation>
     </message>
 </context>
 <context>
     <name>SettingsPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество воспроизведения</translation>
     </message>
     <message>
         <source>Show hints on start</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StartPage</name>
-    <message>
-        <source>Radio Record</source>
-        <translation>Радио Рекорд</translation>
+        <translation>Показывать подсказки на старте</translation>
     </message>
 </context>
 <context>
@@ -73,19 +66,27 @@
     </message>
     <message>
         <source>Podcasts</source>
-        <translation type="unfinished"></translation>
+        <translation>Подкасты</translation>
     </message>
     <message>
         <source>Radio stations</source>
-        <translation type="unfinished"></translation>
+        <translation>Радио станции</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <source>Tap and hold to open context menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и удерживайте, что бы открыть контекстное меню</translation>
+    </message>
+    <message>
+        <source>Show top 100</source>
+        <translation>Показать топ 100</translation>
+    </message>
+    <message>
+        <source>Show history</source>
+        <translation>Показать историю</translation>
     </message>
 </context>
 <context>

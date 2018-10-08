@@ -43,13 +43,6 @@
     </message>
 </context>
 <context>
-    <name>StartPage</name>
-    <message>
-        <source>Radio Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>StationsList</name>
     <message>
         <source>Radio Record</source>
@@ -85,6 +78,14 @@
     </message>
     <message>
         <source>Tap and hold to open context menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show top 100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

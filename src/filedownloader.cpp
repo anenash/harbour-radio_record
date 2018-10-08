@@ -9,6 +9,9 @@
 FileDownloader::FileDownloader(QObject *parent) :
     QObject(parent)
 {
+
+    m_defaultHomePath = qgetenv("HOME");
+
     connect(
                 &m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
                 this, SLOT (fileDownloaded(QNetworkReply*))
@@ -65,7 +68,7 @@ QByteArray FileDownloader::downloadedData() const
 
 void FileDownloader::writeFile(QByteArray data) const
 {
-    QString fileName = defaultPath + "/" + m_fileName;
+    QString fileName = m_defaultHomePath + "/Music/" + m_fileName;
 //    qDebug() << "Write file" << fileName;
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
@@ -86,7 +89,7 @@ QString FileDownloader::fileUrl() const
 
 void FileDownloader::setFileUrl(const QString &fileUrl)
 {
-    qDebug() << "Set file url " << fileUrl;
+//    qDebug() << "Set file url " << fileUrl;
     m_fileUrl = fileUrl;
     QUrl url(m_fileUrl);
     QFileInfo fileInfo(url.toString());

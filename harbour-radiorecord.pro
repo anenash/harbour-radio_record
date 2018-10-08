@@ -48,7 +48,6 @@ DISTFILES += \
 #    qml/Advert/AdInterface.qml \
 #    qml/Advert/AdItem.qml \
 #    qml/Advert/AdParameters.qml \
-    qml/pages/StartPage.qml \
     qml/pages/PlayerItem.qml \
     qml/pages/AboutPage.qml \
     qml/pages/Top100_history.qml \

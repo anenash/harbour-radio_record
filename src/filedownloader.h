@@ -9,8 +9,6 @@
 
 #include <QDebug>
 
-const QString defaultPath = "/home/nemo/Music";
-
 class FileDownloader : public QObject
 {
     Q_OBJECT
@@ -38,6 +36,7 @@ private:
     QString m_fileName;
     QNetworkAccessManager m_WebCtrl;
     QByteArray m_DownloadedData;
+    QByteArray m_defaultHomePath;
 };
 
 #endif // FILEDOWNLOADER_H

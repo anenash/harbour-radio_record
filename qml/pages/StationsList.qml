@@ -180,7 +180,7 @@ Page {
 
             menu: ContextMenu {
                 MenuItem {
-                    text: "Show top 100"
+                    text: qsTr("Show top 100")
                     onClicked: {
                         console.debug("Show top 100")
                         updateTrack.stop();
@@ -191,7 +191,7 @@ Page {
                     }
                 }
                 MenuItem {
-                    text: "Show history"
+                    text: qsTr("Show history")
                     onClicked: {
                         console.debug("Show history")
                         ////history.radiorecord.ru/index-flat.php?station='+radio+'&day=today'

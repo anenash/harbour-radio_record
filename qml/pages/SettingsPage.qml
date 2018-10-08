@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Sailfish.Pickers 1.0
 
 import "Utils.js" as Utils
 import "../utils"
@@ -8,6 +9,7 @@ Dialog {
     id: settingsPage
 
     property string rate
+    property string selectedFile
 
     Database {
         id: database
@@ -52,6 +54,24 @@ Dialog {
                 MenuItem { text: "no" }
             }
         }
+
+//        ValueButton {
+//            id: downloadFolder
+
+//            label: qsTr("Download directory")
+//            value: selectedFile ? selectedFile : "None"
+//            onClicked: pageStack.push(contentPickerPage)
+//        }
+
+//        Component {
+//            id: contentPickerPage
+//            ContentPickerPage {
+//                title: "Select file"
+//                onSelectedContentPropertiesChanged: {
+//                    settingsPage.selectedFile = selectedContentProperties.filePath
+//                }
+//            }
+//        }
     }
 
     onAccepted: {
