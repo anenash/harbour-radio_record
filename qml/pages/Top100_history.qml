@@ -9,6 +9,7 @@ Page {
     id: top100page
 
     property string htmlData: ""
+    property string modelData: ""
     property string pageHeader: qsTr("Top 100")
 
     ListModel {
@@ -20,7 +21,11 @@ Page {
 //            console.log(" the media has played to the end.")
 ////            radioView.incrementCurrentIndex()
 //        }
-        Utils.getTop100(htmlData, listModel);
+//        Utils.getTop100(htmlData, listModel)
+        var historyData = JSON.parse(modelData)
+        for(var i in historyData.result.history) {
+            listModel.append(historyData.result.history[i])
+        }
     }
 
     Component.onDestruction: {
@@ -32,13 +37,15 @@ Page {
         id: listModelDelegate
         ListItem {
             contentHeight: Theme.itemSizeLarge
-            IconButton {
+            Image {
                 id: iconButton
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingLarge
+                fillMode: Image.PreserveAspectFit
+                height: Theme.itemSizeLarge
                 z: 3
-                icon.source: "image://theme/icon-m-music"
+                source: image600?image600:"image://theme/icon-m-music"
             }
 
             Label {
@@ -60,8 +67,16 @@ Page {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.paddingSmall
                 font.pixelSize: Theme.fontSizeExtraSmall
-                text: "Track: " + title
+                text: song
                 wrapMode: Text.WordWrap
+            }
+            Text {
+                id: trackime
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.horizontalPageMargin
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingMedium
+                text: time_formatted
             }
             ProgressBar {
                 id: progressBar
@@ -70,26 +85,26 @@ Page {
                 width: parent.width
                 indeterminate: true
             }
-            FileDownloader {
-                id: downloader
-                onDownloaded: {
-                    progressBar.visible = false
-                }
-            }
+//            FileDownloader {
+//                id: downloader
+//                onDownloaded: {
+//                    progressBar.visible = false
+//                }
+//            }
             onClicked: {
                 radioView.currentIndex = index;
             }
-            menu: ContextMenu {
-                    MenuItem {
-                        enabled: true
-                        text: qsTr("Download track")
-                        onClicked: {
-                            downloader.m_fileUrl = listModel.get(index).href
-                            console.log("Player source", app.player.source)
-                            progressBar.visible = true
-                        }
-                    }
-            }
+//            menu: ContextMenu {
+//                    MenuItem {
+//                        enabled: true
+//                        text: qsTr("Download track")
+//                        onClicked: {
+//                            downloader.m_fileUrl = listModel.get(index).href
+//                            console.log("Player source", app.player.source)
+//                            progressBar.visible = true
+//                        }
+//                    }
+//            }
         }
     }
 
@@ -131,17 +146,17 @@ Page {
             }
 
             VerticalScrollDecorator { }
-//            onCurrentItemChanged: {
-//                console.log("onCurrentItemChanged ", item.title)
-//            }
+
             onCurrentIndexChanged: {
-                app.player.stop()
-                app.radioFullTitle = "<b>Artist:</b> " + listModel.get(currentIndex).artist + "<br><b>Title:</b> " + listModel.get(currentIndex).title
-                app.radioIcon = "RadioRecord.png"
-                app.radioTitle = "<b>" + listModel.get(currentIndex).artist + "</b><br>" + listModel.get(currentIndex).title
-                app.player.source = listModel.get(currentIndex).href
-                app.player.play()
-                console.log("is seekable", app.player.seekable)
+                if(listModel.get(currentIndex).listenUrl){
+                    app.player.stop()
+                    app.radioFullTitle = "<b>Artist:</b> " + listModel.get(currentIndex).artist + "<br><b>Song:</b> " + listModel.get(currentIndex).song
+                    app.radioIcon = "RadioRecord.png"
+                    app.radioTitle = "<b>" + listModel.get(currentIndex).artist + "</b><br>" + listModel.get(currentIndex).song
+                    app.player.source = listModel.get(currentIndex).listenUrl
+                    app.player.play()
+                    console.log("is seekable", app.player.seekable)
+                }
             }
         }
     }

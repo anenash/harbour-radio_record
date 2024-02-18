@@ -78,6 +78,5 @@ Dialog {
         rate = streamBitrate.currentItem.text
         database.storeSettings("bitrate", streamBitrate.currentIndex, streamBitrate.currentItem.text)
         database.storeSettings("hints", showHints.currentIndex, showHints.currentItem.text)
-        console.log("Rate", rate)
     }
 }

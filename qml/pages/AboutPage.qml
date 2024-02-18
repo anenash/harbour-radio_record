@@ -31,25 +31,6 @@ Page {
                 Qt.openUrlExternally(link);
             }
         }
-        Label {
-            id: secondParagraph
-            width: parent.width
-            anchors.margins: Theme.paddingLarge
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            text: qsTr("I will be very appreciated if you will support this application.")
-        }
-
-        Image {
-            source: "https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif"
-            anchors.horizontalCenter: parent.horizontalCenter
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    Qt.openUrlExternally("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=anenash%40outlook%2ecom&lc=GB&item_name=For%20application%20improving&no_note=0&currency_code=RUB&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest")
-                }
-            }
-        }
     }
 }
 

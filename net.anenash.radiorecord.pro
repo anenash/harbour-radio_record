@@ -10,24 +10,20 @@
 #   - translation filenames have to be changed
 
 # The name of your application
-TARGET = harbour-radiorecord
+TARGET = net.anenash.radiorecord
 
 CONFIG += sailfishapp
+QT += sql
 
-SOURCES += src/harbour-radiorecord.cpp \
-#    src/systemimei.cpp \
-    src/filedownloader.cpp
-#    src/network.cpp
+SOURCES += \
+    src/filedownloader.cpp \
+    src/net.anenash.radiorecord.cpp
 
-OTHER_FILES += qml/harbour-radiorecord.qml \
+OTHER_FILES += \
     qml/cover/CoverPage.qml \
-    rpm/harbour-radiorecord.changes.in \
-    rpm/harbour-radiorecord.spec \
-    rpm/harbour-radiorecord.yaml \
-    translations/*.ts \
-    harbour-radiorecord.desktop
+    translations/*.ts
 
-SAILFISHAPP_ICONS = 86x86 108x108 128x128 256x256
+SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172 256x256
 
 # to disable building translations every time, comment out the
 # following CONFIG line
@@ -37,26 +33,24 @@ CONFIG += sailfishapp_i18n
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/harbour-radiorecord-ru.ts
+TRANSLATIONS += translations/net.anenash.radiorecord-ru.ts
 
 DISTFILES += \
+    net.anenash.radiorecord.desktop \
+    qml/net.anenash.radiorecord.qml \
     qml/pages/Utils.js \
     qml/pages/RadioRecord.png \
     qml/pages/StationsList.qml \
     qml/cover/RadioRecord.png \
-#    qml/Advert/adFunctions.js \
-#    qml/Advert/AdInterface.qml \
-#    qml/Advert/AdItem.qml \
-#    qml/Advert/AdParameters.qml \
     qml/pages/PlayerItem.qml \
     qml/pages/AboutPage.qml \
     qml/pages/Top100_history.qml \
     qml/pages/PodcastPage.qml \
     qml/pages/SettingsPage.qml \
-    qml/utils/Database.qml
+    qml/utils/Database.qml \
+    rpm/net.anenash.radiorecord.spec \
+    rpm/net.anenash.radiorecord.yaml
 
 HEADERS += \
-#    src/systemimei.h \
     src/filedownloader.h
-#    src/network.h
 

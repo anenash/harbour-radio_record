@@ -69,8 +69,8 @@ Page {
             return;
         }
         var json = JSON.parse(data);
-        for (var i in json.result) {
-            stationsList.append(json.result[i])
+        for (var i in json.result.stations) {
+            stationsList.append(json.result.stations[i])
         }
         Utils.sendHttpRequest("GET", Utils.podcastIdsUrl, getPocastsList)
     }
@@ -88,18 +88,18 @@ Page {
 
     function getTrackInfo(data) {
         if(data === "error") {
-            console.debug("getTrackInfo: Source does not found.")
+            console.warn("getTrackInfo: Source does not found.")
             return;
         }
         var json = JSON.parse(data);
 
         for (var i in json.result) {
-            if (json.result[i].prefix.toString() === currentStationId.toString()) {
-                playerItem.stationLogo = json.result[i].image600
-                app.radioIcon = json.result[i].image600
+            if (json.result[i].id.toString() === currentStationId.toString()) {
+                playerItem.stationLogo = json.result[i].track.image600
+                app.radioIcon = json.result[i].track.image600
 
-                app.radioFullTitle = "Artist: " + json.result[i].artist + "\nTitle: " + json.result[i].song
-                app.radioTitle = "<b>" + json.result[i].artist + "</b><br>" + json.result[i].song
+                app.radioFullTitle = json.result[i].track.artist + "\n" + json.result[i].track.song
+                app.radioTitle = "<b>" + json.result[i].track.artist + "</b><br>" + json.result[i].track.song
             }
         }
     }
@@ -118,8 +118,6 @@ Page {
             break
         }
         player.play()
-
-        console.log("Quality changed to", player.source)
     }
 
     InteractionHintLabel {
@@ -133,6 +131,7 @@ Page {
     
     TapInteractionHint {
         id: tapHint
+
         loops: Animation.Infinite
         anchors.centerIn: parent
         visible: internal.showHint
@@ -148,17 +147,19 @@ Page {
 
     Component {
         id: stationDelegate
+
         ListItem {
-            contentHeight: Theme.itemSizeLarge
+            contentHeight: Theme.itemSizeExtraLarge
             Image {
                 id: radioLogo
+
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.paddingLarge
                 anchors.verticalCenter: parent.verticalCenter
                 height: 96 * Theme.pixelRatio
                 width: 96 * Theme.pixelRatio
                 fillMode: Image.PreserveAspectFit
-                source: icon_png
+                source: icon_fill_colored //icon_png
                 BusyIndicator {
                     size: BusyIndicatorSize.Medium
                     anchors.centerIn: radioLogo
@@ -166,36 +167,62 @@ Page {
                 }
                 onStatusChanged: {
                     if(status === Image.Error) {
-                        console.debug("Can not load image");
+                        console.error("Can not load image");
                         source = "RadioRecord.png"
                     }
                 }
             }
             Label {
+                id: titleLabel
+
                 anchors.left: radioLogo.right
-                anchors.leftMargin: 5
-                anchors.verticalCenter: radioLogo.verticalCenter
+                anchors.leftMargin: Theme.horizontalPageMargin
+                anchors.top: parent.top
+                anchors.topMargin: Theme.paddingSmall
                 text: title
             }
 
-            menu: ContextMenu {
-                MenuItem {
-                    text: qsTr("Show top 100")
-                    onClicked: {
-                        console.debug("Show top 100")
-                        updateTrack.stop();
-                        playerItem.stationLogo = "RadioRecord.png"
-                        nextPageTitle = qsTr("Top 100 ") + title
-                        var url = trackStartUrl + "top100/" + prefix + ".txt";
-                        Utils.sendHttpRequest("GET", url, processData);                        ;
-                    }
+            Text {
+//                anchors.left: radioLogo.right
+//                anchors.leftMargin: Theme.horizontalPageMargin
+//                anchors.top: titleLabel.bottom
+//                anchors.topMargin: Theme.paddingSmall
+//                anchors.right: parent.right
+//                anchors.rightMargin: Theme.horizontalPageMargin
+                anchors {
+                    top: titleLabel.bottom
+                    topMargin: Theme.paddingSmall
+                    left: radioLogo.right
+                    leftMargin: Theme.horizontalPageMargin
+                    right: parent.right
+                    rightMargin: Theme.horizontalPageMargin
                 }
+                color: Theme.secondaryColor
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                text: tooltip
+            }
+
+            menu: ContextMenu {
+//                MenuItem {
+//                    text: qsTr("Show top 100")
+//                    onClicked: {
+//                        console.debug("Show top 100")
+//                        updateTrack.stop();
+//                        playerItem.stationLogo = "RadioRecord.png"
+//                        nextPageTitle = qsTr("Top 100 ") + title
+//                        var url = trackStartUrl + "top100/" + prefix + ".txt";
+//                        Utils.sendHttpRequest("GET", url, processData);                        ;
+//                    }
+//                }
                 MenuItem {
                     text: qsTr("Show history")
                     onClicked: {
-                        console.debug("Show history")
                         ////history.radiorecord.ru/index-flat.php?station='+radio+'&day=today'
-                        var url = "http://history.radiorecord.ru/index-flat.php?station=" + prefix + "&day=today"
+                        //var url = "http://history.radiorecord.ru/index-flat.php?station=" + prefix + "&day=today"
+//                        var url = "https://www.radiorecord.ru/api/api/station/history/?full&id=" + id
+                        var url = "https://www.radiorecord.ru/api/api/station/history/?today&id=" + id
                         updateTrack.stop()
                         nextPageTitle = title + qsTr(" history")
                         playerItem.stationLogo = "RadioRecord.png"
@@ -206,7 +233,7 @@ Page {
 
             function processData(data) {
                 app.showFullControl = true
-                pageStack.push(Qt.resolvedUrl("Top100_history.qml"), {htmlData: data, pageHeader: nextPageTitle});
+                pageStack.push(Qt.resolvedUrl("Top100_history.qml"), {modelData: data, pageHeader: nextPageTitle});
             }
 
             onPressed: {
@@ -217,9 +244,9 @@ Page {
 
             onClicked: {
                 radioView.currentIndex = index
-                currentStationId = prefix
+                currentStationId = id
                 playerItem.streamBitrate = internal.streamBitrate
-                radioIcon = icon_png
+                radioIcon = icon_fill_colored
                 radioTitle = title
                 player.stop()
                 player.source = internal.streamBitrate === "320 kbps"?stream_320:internal.streamBitrate === "128 kbps"?stream_128:stream_64
@@ -233,6 +260,7 @@ Page {
 
     Component {
         id: podcastDelegate
+
         ListItem {
             contentHeight: Theme.itemSizeLarge
             Image {
@@ -243,7 +271,7 @@ Page {
                 height: 96 * Theme.pixelRatio
                 width: 96 * Theme.pixelRatio
                 fillMode: Image.PreserveAspectFit
-                source: cover
+                source: cover_vertical
                 BusyIndicator {
                     size: BusyIndicatorSize.Medium
                     anchors.centerIn: podcastLogo
@@ -285,8 +313,64 @@ Page {
             anchors.fill: parent
         }
         backgroundSize: 185 * Theme.pixelRatio
-        SilicaListView {
+/*        TabView {
+
+            anchors.fill: parent
+            header: TabBar {
+                model: ["Stations", "Podcasts"]
+            }
+
+            model: [stations, podcasts]
+
+            Component {
+                id: stations
+
+                TabItem {
+                    flickable: true
+                    SilicaListView {
+                        id: radioView
+                        anchors.fill: parent
+                        model: stationsList
+                        delegate: stationDelegate
+                        spacing: Theme.paddingSmall
+                        clip: true
+                        currentIndex: -1
+                        highlight: Rectangle {
+                            color: "#b1b1b1"
+                            opacity: 0.3
+                        }
+                        VerticalScrollDecorator { }
+                    }
+                }
+            }
+            Component {
+                id: podcasts
+
+                TabItem {
+                    flickable: true
+                    SilicaListView {
+                        id: radioView
+                        anchors.fill: parent
+                        model: podcastsList
+                        delegate: podcastDelegate
+                        spacing: Theme.paddingSmall
+                        clip: true
+                        currentIndex: -1
+                        highlight: Rectangle {
+                            color: "#b1b1b1"
+                            opacity: 0.3
+                        }
+                        VerticalScrollDecorator { }
+                    }
+                }
+            }
+
+
+        }*/
+
+       SilicaListView {
             id: radioView
+
             anchors.fill: parent
             header: PageHeader { id: viewHeader; title: qsTr("Radio Record") }
             model: internal.isRadio?stationsList:podcastsList
@@ -301,6 +385,7 @@ Page {
             VerticalScrollDecorator { }
             PullDownMenu {
                 id: pullDownMenu
+
                 MenuItem {
                     text: qsTr("About")
                     onClicked: {

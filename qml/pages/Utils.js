@@ -6,11 +6,15 @@ var topHref = /href="([^]*?)"/g;
 var artist = /artist">([^]*?)<\/span>/g;
 var title = /title">([^]*?)<\/span>/g;
 
-var stationsUrl = "http://www.radiorecord.ru/radioapi/stations/"
-var tracksUrl = "https://www.radiorecord.ru/radioapi/stations/now/"
-var podcastIdsUrl = "http://www.radiorecord.ru/radioapi/podcasts/"
-var pocaststracsUrl = "http://www.radiorecord.ru/radioapi/podcast/?id=" // +pocastId from podcastIdsUrl list
+//var stationsUrl = "http://www.radiorecord.ru/radioapi/stations/"
+var stationsUrl = "https://app-api.radiorecord.ru/api/stations/"
+//var tracksUrl = "https://www.radiorecord.ru/radioapi/stations/now/"
+var tracksUrl = stationsUrl + "now/"
+var podcastIdsUrl = "https://www.radiorecord.ru/api/podcasts/"
 
+var pocaststracsUrl = "http://www.radiorecord.ru/api/podcast/?id=" // +pocastId from podcastIdsUrl list
+
+var stationHistory = "radiorecord.ru/api/api/station/history/?full&id=" // +stationId
 
 function sendHttpRequest(requestType, url, callback, params) {
     var doc = new XMLHttpRequest();

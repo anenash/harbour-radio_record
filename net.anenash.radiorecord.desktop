@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 X-Nemo-Application-Type=silica-qt5
-Icon=harbour-radiorecord
-Exec=harbour-radiorecord
+Icon=net.anenash.radiorecord
+Exec=net.anenash.radiorecord
 Name=Radio Record
 # translation example:
 # your app name in German locale (de)
@@ -11,4 +11,9 @@ Name=Radio Record
 # a different app name in German locale (de).
 Name[de]=Radio Record
 Name[ru]=Радио Рекорд
+
+[X-Sailjail]
+ApplicationName=Radio_Record
+OrganizationName=net.anenash.radio_record
+Permissions=Internet;Audio
 

@@ -26,12 +26,13 @@ Page {
         if(data === "error") {
             var url = Utils.pocaststracsUrl + id
             Utils.sendHttpRequest("GET", url, getPodcastTracks)
-            return;
+            return
         }
         var json = JSON.parse(data)
-        internal.coverLink = json.result.cover
-        for (var i in json.result.items) {
-            podcastsModel.append(json.result.items[i])
+        internal.coverLink = json.result.tracks[1].image600
+        internal.pageHeader = json.result.tracks[1].artist
+        for (var i in json.result.tracks) {
+            podcastsModel.append(json.result.tracks[i])
         }
     }
 
@@ -41,8 +42,9 @@ Page {
 
     Component {
         id: podcastsModelDelegate
+
         ListItem {
-            contentHeight: Theme.itemSizeLarge
+            contentHeight: Theme.itemSizeExtraLarge
             Image {
                 id: iconButton
                 anchors.verticalCenter: parent.verticalCenter
@@ -51,30 +53,33 @@ Page {
                 z: 3
                 height: parent.height
                 fillMode: Image.PreserveAspectFit
-                source: internal.coverLink
+                source: image600
             }
 
             Label {
-                anchors.left: iconButton.right
-                anchors.leftMargin: Theme.paddingMedium
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.paddingMedium
-                anchors.top: parent.top
-                anchors.topMargin: Theme.paddingSmall
-                text: artist
-                font.pixelSize: Theme.fontSizeSmall
-                wrapMode: Text.WordWrap
-            }
-            Label {
+                id: trackTitle
+
                 anchors.left: iconButton.right
                 anchors.leftMargin: Theme.paddingMedium
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMediu
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: Theme.paddingSmall
+                anchors.top: parent.top //podcastTitle.bottom
+                anchors.topMargin: Theme.paddingSmall
                 font.pixelSize: Theme.fontSizeExtraSmall
-                text: "Track: " + song
+                text: song
                 wrapMode: Text.WordWrap
+            }
+            Text {
+                anchors.left: iconButton.right
+                anchors.leftMargin: Theme.paddingMedium
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMediu
+                anchors.top: trackTitle.bottom
+                anchors.topMargin: Theme.paddingSmall
+                text: playlist
+                maximumLineCount: 2
+                elide: Text.ElideRight
+                color: Theme.secondaryColor
             }
             ProgressBar {
                 id: progressBar
@@ -83,26 +88,25 @@ Page {
                 width: parent.width
                 indeterminate: true
             }
-            FileDownloader {
+            /*FileDownloader {
                 id: downloader
                 onDownloaded: {
                     progressBar.visible = false
                 }
-            }
+            }*/
             onClicked: {
                 podcastsView.currentIndex = index;
             }
-            menu: ContextMenu {
+            /*menu: ContextMenu {
                     MenuItem {
                         enabled: true
                         text: qsTr("Download podcast")
                         onClicked: {
                             downloader.m_fileUrl = podcastsModel.get(index).link
-                            console.log("Player source", app.player.source)
                             progressBar.visible = true
                         }
                     }
-            }
+            }*/
         }
     }
 
@@ -131,11 +135,12 @@ Page {
         backgroundSize: 250 * Theme.pixelRatio
         SilicaListView {
             id: podcastsView
+
             anchors.fill: parent
             header: PageHeader { id: viewHeader; title: internal.pageHeader}
             model: podcastsModel
             delegate: podcastsModelDelegate
-            spacing: Theme.paddingLarge
+            spacing: Theme.paddingSmall
             clip: true
             highlight: Rectangle {
                 color: "#b1b1b1"
@@ -146,12 +151,11 @@ Page {
 
             onCurrentIndexChanged: {
                 app.player.stop()
-                app.radioFullTitle = "<b>Artist:</b> " + podcastsModel.get(currentIndex).artist + "<br><b>Title:</b> " + podcastsModel.get(currentIndex).song
+                app.radioFullTitle = podcastsModel.get(currentIndex).artist + "<br>" + podcastsModel.get(currentIndex).song
                 app.radioIcon = internal.coverLink
                 app.radioTitle = "<b>" + podcastsModel.get(currentIndex).artist + "</b><br>" + podcastsModel.get(currentIndex).song
                 app.player.source = podcastsModel.get(currentIndex).link
                 app.player.play()
-                console.log("is seekable", app.player.seekable)
             }
         }
     }

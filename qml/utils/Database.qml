@@ -1,5 +1,5 @@
 import QtQuick 2.6
-import QtQuick.LocalStorage 2.0 as Sql
+import QtQuick.LocalStorage 2.0
 
 Item {
 
@@ -15,7 +15,7 @@ Item {
     function initDatabase() {
         // initialize the database object
         console.log('initDatabase()')
-        internal._db = Sql.LocalStorage.openDatabaseSync("RecordFM", "1.0", "Radio record StorageDatabase", 100000)
+        internal._db = LocalStorage.openDatabaseSync("RecordFM", "1.0", "Radio record StorageDatabase", 100000)
         internal._db.transaction( function(tx) {
             // Create the database if it doesn't already exist
             console.log("Create the database if it doesn't already exist")
